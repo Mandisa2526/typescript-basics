@@ -8,44 +8,19 @@ import GreetInEnglish from '../greetInEnglish';
 import GreetInXhosa from '../greetInXhosa';
 import MapUserGreetCounter from '../userCounter';
 //import { Pool } from 'pg';
-import UserGreetCounter from '../posgresqlusergreet';
+import UserGreetCounter, { PostgreSQLGreetable } from '../posgresqlusergreet';
 import PostgreSQLUserGreetCounter from '../posgresqlusergreet';
 import pgPromise from 'pg-promise';
 import Greetable from '../person'
+import { Pool } from 'pg';
+import { Context } from 'mocha';
 
 
 const pgp = pgPromise();
 
-// const connectionString = "postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje?ssl=true";
-// const db = pgp(connectionString);
+const connectionString = "postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje?ssl=true";
+const db = pgp(connectionString);
 
-//Test your new version of Greeter that is using Greetable using mocha.
-
-// describe('Greeter', () => {
-//   let greeter: Greeter;
-//   let greetableMock: Greetable;
-//   let userGreetCounterMock: UserGreetCounter;
-
-//   beforeEach(() => {
-
-//       // Creating an instance of Greeter with mocked dependencies
-//       greeter = new Greeter(greetableMock, userGreetCounterMock);
-//   });
-
-//   it('should greet with the provided language and name', () => {
-//       const name = 'Alice';
-//       const language = 'English';
-//       const expectedGreeting = `Mocked greeting for ${name} in ${language}`;
-
-//       // Calling the greet method of Greeter
-//       const actualGreeting = greeter.greet(name, language);
-
-//       // Asserting that the actual greeting matches the expected greeting
-//       assert.equal(actualGreeting, expectedGreeting);
-//   });
-
-//   // Add more test cases as needed
-// });
 
 describe('Greeter', () => {
   it('should greet with the provided name in Xhosa', () => {
@@ -108,13 +83,41 @@ describe('Greeter', () => {
 });
 //tests for greeter using greetable
 
+describe('Greeter', () => {
+  let greeter: Greeter;
+  let greetable: Greetable;
+  let userGreetCounter: UserGreetCounter;
 
+  beforeEach(() => {
+    // Create instances of mock objects for testing
+    let greetable = new GreetInEnglish();
+    let userGreetCounter = new MapUserGreetCounter();
+    // Create an instance of Greeter with mock objects
+    greeter = new Greeter(mockGreetable, mockUserGreetCounter);
+
+  });
+
+  it('should greet with the provided language and name', () => {
+    const name = 'Alice';
+    const gretlanguage = language.eng;
+    const expectedGreeting = `Mocked greeting for ${name} in ${gretlanguage}`;
+
+    // Calling the greet method of Greeter
+    const actualGreeting = greeter.greet(name, gretlanguage);
+
+    // Asserting that the actual greeting matches the expected greeting
+    assert.equal(actualGreeting, expectedGreeting);
+  });
+
+  // Add more test cases as needed
+});
 
 describe('MapUserGreetCounter', () => {
   let userGreetCounter: MapUserGreetCounter;
 
-  beforeEach(() => {
+  beforeEach(async function () {
     userGreetCounter = new MapUserGreetCounter();
+
   });
 
   it('should count the greet for a user', () => {
@@ -170,12 +173,22 @@ describe('MapUserGreetCounter', () => {
 describe('PostgreSQLUserGreetCounter', () => {
   let UserGreetCounter: UserGreetCounter;
 
-  beforeEach(() => {
-    UserGreetCounter = new PostgreSQLUserGreetCounter();
+  beforeEach(async function (this: Context) {
+
+    try {
+      this.timeout(5000); // Set timeout to 5 seconds
+      UserGreetCounter = new PostgreSQLUserGreetCounter();
+
+      // clean the tables before each test run
+      await db.none("TRUNCATE TABLE GreetingCount RESTART IDENTITY CASCADE;");
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   });
 
-  it('increments greeting count correctly', async () =>{
-
+  it('increments greeting count correctly', async function (this: Context) {
+    
 
     // Arrange
     const userId = 1;
@@ -186,24 +199,61 @@ describe('PostgreSQLUserGreetCounter', () => {
 
     // Assert
     const count = await UserGreetCounter.getGreetingCount(userId, userName);
-    setTimeout(function () {
-      assert.equal(1, count)
-      done();
-    }, 1000);
+    assert.equal(1, count)
+
   })
-  it('returns correct greeting count', async () => {
-  
+
+  it('returns correct greeting count', async function (this: Context) {
+    this.timeout(10000);
+
     await UserGreetCounter.incrementGreetingCount(2, 'Alice');
     await UserGreetCounter.incrementGreetingCount(2, 'Alice');
     const count = await UserGreetCounter.getGreetingCount(2, 'Alice');
-    
-    
-    assert.equal(2, count)
-   
-});
+
+    assert.equal(2, count);
+  });
 
 });
 
-function done() {
-  throw new Error('Function not implemented.');
-}
+describe('PostgreSQLGreetable', () => {
+  let pool: Pool;
+  let greetable: PostgreSQLGreetable;
+
+  before(() => {
+    // Create a Pool instance for testing
+    pool = new Pool({
+      connectionString: 'postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje'
+    });
+
+    // Initialize the greetable instance
+    greetable = new PostgreSQLGreetable(pool);
+  });
+
+  after(async () => {
+    // Close the Pool after all tests are done
+    await pool.end();
+  });
+
+  it('should add language greeting', async () => {
+
+    const language = 'Spanish';
+    const greeting = 'Hola, Mundo';
+
+    await greetable.addLanguageGreeting(language, greeting);
+
+    // Add assertions to ensure language greeting is added successfully (e.g., check database state)
+    const retrievedGreeting = await greetable.getGreeting(language);
+    // You might need to use a database library like pg-mem to mock the database interactions for testing
+    assert.equal(greeting, retrievedGreeting)
+  });
+  it('should get greeting for a language', async () => {
+    const greetLanguage = "English";
+    const expectedGreeting = 'Hello, World';
+
+    const actualGreeting = await greetable.getGreeting(greetLanguage);
+
+    assert.equal(expectedGreeting, actualGreeting)
+  });
+
+});
+

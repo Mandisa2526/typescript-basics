@@ -1,9 +1,11 @@
 import { language } from "./language"
 
 //xport an interface named Person
-export default interface Person {//define the shape or structure of an object.
+export default interface Person {
+    _greet: any//define the shape or structure of an object.
     firstName: string//properties and their types that an object should have
     lastName: string
+    
     
 }
 export interface GreetIn {
@@ -28,21 +30,4 @@ export interface GreetingCount {
 }
 export interface  Greetable {
     greet(firstName:string, language:language) : string
-    
-}
-
-export  class GreetInEnglish implements GreetIn {
-    greet(name: string) {
-      return "Hello, " + name;
-    }
-}
-export  class GreetInXhosa implements GreetIn {
-    greet(name: string) {
-      return "Molo, " + name;
-    }
-}
-export class GreetInZulu implements GreetIn {
-    greet(name: string) {
-      return "Sawubona, " + name;
-    }
 }
