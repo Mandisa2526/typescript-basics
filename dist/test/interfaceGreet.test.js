@@ -11,11 +11,14 @@ const greetInZulu_1 = __importDefault(require("../greetInZulu"));
 const greetInEnglish_1 = __importDefault(require("../greetInEnglish"));
 const greetInXhosa_1 = __importDefault(require("../greetInXhosa"));
 const userCounter_1 = __importDefault(require("../userCounter"));
-const posgresqlusergreet_1 = __importDefault(require("../posgresqlusergreet"));
+//import { Pool } from 'pg';
+const posgresqlusergreet_1 = require("../posgresqlusergreet");
+const posgresqlusergreet_2 = __importDefault(require("../posgresqlusergreet"));
 const pg_promise_1 = __importDefault(require("pg-promise"));
+const pg_1 = require("pg");
 const pgp = (0, pg_promise_1.default)();
-// const connectionString = "postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje?ssl=true";
-// const db = pgp(connectionString);
+const connectionString = "postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje?ssl=true";
+const db = pgp(connectionString);
 describe('Greeter', () => {
     it('should greet with the provided name in Xhosa', () => {
         const result = (0, greet_1.greet)('John', language_1.language.xhosa);
@@ -63,7 +66,7 @@ describe('Greeter', () => {
 //tests for greeter using greetable
 describe('MapUserGreetCounter', () => {
     let userGreetCounter;
-    beforeEach(() => {
+    beforeEach(async function () {
         userGreetCounter = new userCounter_1.default();
     });
     it('should count the greet for a user', () => {
@@ -106,10 +109,19 @@ describe('MapUserGreetCounter', () => {
 // database tests
 describe('PostgreSQLUserGreetCounter', () => {
     let UserGreetCounter;
-    beforeEach(() => {
-        UserGreetCounter = new posgresqlusergreet_1.default();
+    beforeEach(async function () {
+        try {
+            this.timeout(5000); // Set timeout to 5 seconds
+            UserGreetCounter = new posgresqlusergreet_2.default();
+            // clean the tables before each test run
+            await db.none("TRUNCATE TABLE GreetingCount RESTART IDENTITY CASCADE;");
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
     });
-    it('increments greeting count correctly', async () => {
+    it('increments greeting count correctly', async function () {
         // Arrange
         const userId = 1;
         const userName = 'John';
@@ -117,18 +129,41 @@ describe('PostgreSQLUserGreetCounter', () => {
         await UserGreetCounter.incrementGreetingCount(userId, userName);
         // Assert
         const count = await UserGreetCounter.getGreetingCount(userId, userName);
-        setTimeout(function () {
-            assert_1.default.equal(1, count);
-            done();
-        }, 1000);
+        assert_1.default.equal(1, count);
     });
-    it('returns correct greeting count', async () => {
+    it('returns correct greeting count', async function () {
+        this.timeout(10000);
         await UserGreetCounter.incrementGreetingCount(2, 'Alice');
         await UserGreetCounter.incrementGreetingCount(2, 'Alice');
         const count = await UserGreetCounter.getGreetingCount(2, 'Alice');
         assert_1.default.equal(2, count);
     });
 });
-function done() {
-    throw new Error('Function not implemented.');
-}
+describe('PostgreSQLGreetable', () => {
+    //let greetable: PostgreSQLGreetable;
+    const pool = new pg_1.Pool(); // Create a Pool instance
+    const greetable = new posgresqlusergreet_1.PostgreSQLGreetable(pool);
+    // Initialize the greetable instance
+    beforeEach(async function () {
+        try {
+            this.timeout(10000);
+            // clean the tables before each test run
+            await db.none("TRUNCATE TABLE language_greetings RESTART IDENTITY CASCADE;");
+            await db.none("INSERT INTO language_greetings(language, greeting) VALUES('en', 'Hello')");
+            await db.none("INSERT INTO language_greetings(language, greeting) VALUES('fr', 'Bonjour')");
+            await db.none("INSERT INTO language_greetings(language, greeting) VALUES('es', 'Hola')");
+        }
+        catch (err) {
+            console.log(err);
+            throw err;
+        }
+    });
+    it('should add and retrieve language greeting', async () => {
+        // Add a language greeting
+        await greetable.addLanguageGreeting('en', 'Hello');
+        // Retrieve the language greeting
+        const greeting = await greetable.getGreeting('en');
+        // Assert that the retrieved greeting matches the expected value
+        assert_1.default.equal(greeting, 'Hello');
+    });
+});

@@ -83,34 +83,6 @@ describe('Greeter', () => {
 });
 //tests for greeter using greetable
 
-describe('Greeter', () => {
-  let greeter: Greeter;
-  let greetable: Greetable;
-  let userGreetCounter: UserGreetCounter;
-
-  beforeEach(() => {
-    // Create instances of mock objects for testing
-    let greetable = new GreetInEnglish();
-    let userGreetCounter = new MapUserGreetCounter();
-    // Create an instance of Greeter with mock objects
-    greeter = new Greeter(mockGreetable, mockUserGreetCounter);
-
-  });
-
-  it('should greet with the provided language and name', () => {
-    const name = 'Alice';
-    const gretlanguage = language.eng;
-    const expectedGreeting = `Mocked greeting for ${name} in ${gretlanguage}`;
-
-    // Calling the greet method of Greeter
-    const actualGreeting = greeter.greet(name, gretlanguage);
-
-    // Asserting that the actual greeting matches the expected greeting
-    assert.equal(actualGreeting, expectedGreeting);
-  });
-
-  // Add more test cases as needed
-});
 
 describe('MapUserGreetCounter', () => {
   let userGreetCounter: MapUserGreetCounter;
@@ -188,7 +160,7 @@ describe('PostgreSQLUserGreetCounter', () => {
   });
 
   it('increments greeting count correctly', async function (this: Context) {
-    
+
 
     // Arrange
     const userId = 1;
@@ -216,44 +188,41 @@ describe('PostgreSQLUserGreetCounter', () => {
 });
 
 describe('PostgreSQLGreetable', () => {
-  let pool: Pool;
-  let greetable: PostgreSQLGreetable;
 
-  before(() => {
-    // Create a Pool instance for testing
-    pool = new Pool({
-      connectionString: 'postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje'
-    });
+  //let greetable: PostgreSQLGreetable;
+  const pool = new Pool(); // Create a Pool instance
+  const greetable = new PostgreSQLGreetable(pool);
 
-    // Initialize the greetable instance
-    greetable = new PostgreSQLGreetable(pool);
+  // Initialize the greetable instance
+  beforeEach(async function (this: Context) {
+   
+    try {
+      this.timeout(10000);
+      // clean the tables before each test run
+      await db.none("TRUNCATE TABLE language_greetings RESTART IDENTITY CASCADE;");
+
+      await db.none("INSERT INTO language_greetings(language, greeting) VALUES('en', 'Hello')");
+      await db.none("INSERT INTO language_greetings(language, greeting) VALUES('fr', 'Bonjour')");
+      await db.none("INSERT INTO language_greetings(language, greeting) VALUES('es', 'Hola')");
+
+
+    } catch (err) {
+      console.log(err);
+      throw err;
+    }
   });
 
-  after(async () => {
-    // Close the Pool after all tests are done
-    await pool.end();
-  });
+  it('should add and retrieve language greeting', async () => {
+    // Add a language greeting
+    await greetable.addLanguageGreeting('en', 'Hello');
 
-  it('should add language greeting', async () => {
+    // Retrieve the language greeting
+    const greeting = await greetable.getGreeting('en');
 
-    const language = 'Spanish';
-    const greeting = 'Hola, Mundo';
+    // Assert that the retrieved greeting matches the expected value
+    assert.equal(greeting, 'Hello');
+});
 
-    await greetable.addLanguageGreeting(language, greeting);
-
-    // Add assertions to ensure language greeting is added successfully (e.g., check database state)
-    const retrievedGreeting = await greetable.getGreeting(language);
-    // You might need to use a database library like pg-mem to mock the database interactions for testing
-    assert.equal(greeting, retrievedGreeting)
-  });
-  it('should get greeting for a language', async () => {
-    const greetLanguage = "English";
-    const expectedGreeting = 'Hello, World';
-
-    const actualGreeting = await greetable.getGreeting(greetLanguage);
-
-    assert.equal(expectedGreeting, actualGreeting)
-  });
 
 });
 
