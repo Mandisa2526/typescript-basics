@@ -19,6 +19,17 @@ const pg_1 = require("pg");
 const pgp = (0, pg_promise_1.default)();
 const connectionString = "postgres://ayszwgje:LWKoBXeAlPDOy7qs6TarjxhBak0WS4w3@bubble.db.elephantsql.com:5432/ayszwgje?ssl=true";
 const db = pgp(connectionString);
+//const greetLanguages = new Map<language, GreetIn>();
+// const englishGreet = new GreetInEnglish();
+// const xhosaGreet = new GreetInXhosa();
+// const zuluGreet = new GreetInZulu();
+const greetMap = new Map();
+greetMap.set(language_1.language.zulu, new greetInZulu_1.default());
+greetMap.set(language_1.language.eng, new greetInEnglish_1.default());
+greetMap.set(language_1.language.xhosa, new greetInXhosa_1.default());
+const greetMapAdapter = new greet_1.GreetInManager(greetMap);
+const mapUserGreetCounter = new userCounter_1.default();
+const greeter = new greet_1.Greeter(greetMapAdapter, mapUserGreetCounter);
 describe('Greeter', () => {
     it('should greet with the provided name in Xhosa', () => {
         const result = (0, greet_1.greet)('John', language_1.language.xhosa);
@@ -63,7 +74,50 @@ describe('Greeter', () => {
         assert_1.default.equal(3, userCounter.greetCounter);
     });
 });
-//tests for greeter using greetable
+//Test your new version of Greeter that is using Greetable
+it('should greet the user correctly in English', () => {
+    const name = 'John';
+    const chosenLanguage = language_1.language.eng;
+    const expectedGreeting = `Hello, John`;
+    const greeting = greeter.greet(name, chosenLanguage);
+    assert_1.default.equal(expectedGreeting, greeting);
+});
+it('should greet the user correctly in Xhosa', () => {
+    const name = 'Ayanda';
+    const chosenLanguage = language_1.language.xhosa;
+    const expectedGreeting = `Molo, Ayanda`;
+    const greeting = greeter.greet(name, chosenLanguage);
+    assert_1.default.equal(expectedGreeting, greeting);
+});
+it('should greet the user correctly in Zulu', () => {
+    const name = 'John';
+    const chosenLanguage = language_1.language.zulu;
+    const expectedGreeting = `Sawubona, John`;
+    const greeting = greeter.greet(name, chosenLanguage);
+    assert_1.default.equal(expectedGreeting, greeting);
+});
+it('should return a blank greeting if language is not available', () => {
+    const name = 'John';
+    const chosenLanguage = language_1.language.frnc; // Assuming French is not available
+    const expectedGreeting = '';
+    const greeting = greeter.greet(name, chosenLanguage);
+    assert_1.default.equal(expectedGreeting, greeting);
+});
+it('should increment greet counter when greeting a user', () => {
+    const name = 'John';
+    const chosenLanguage = language_1.language.eng;
+    greeter.greet(name, chosenLanguage);
+    // Check if the greet counter has been incremented
+    assert_1.default.equal(5, greeter.greetCounter);
+});
+it('should increment greet counter for each user', () => {
+    const names = ['Alice', 'Bob', 'Charlie'];
+    const chosenLanguage = language_1.language.eng;
+    // Greet multiple users
+    names.forEach((name) => greeter.greet(name, chosenLanguage));
+    // Check if the greet counter has been incremented for each user
+    assert_1.default.equal(8, greeter.greetCounter);
+});
 describe('MapUserGreetCounter', () => {
     let userGreetCounter;
     beforeEach(async function () {

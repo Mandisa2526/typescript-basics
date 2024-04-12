@@ -8,10 +8,7 @@ import MapUserGreetCounter from './userCounter';
 import { Pool } from 'pg';
 import {Greetable} from './person'
 
-// export default function greet(person: Person) {  
-//    return `Hello, ${person.firstName} ${person.lastName} we can't contact you.`;
 
-// }
 
 export interface GreetIn {
   greet(name: string): string;
