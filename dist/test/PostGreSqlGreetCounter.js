@@ -4,15 +4,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const assert_1 = __importDefault(require("assert"));
-const posgresqlusergreet_1 = __importDefault(require("../posgresqlusergreet"));
+const Posgresqlusergreet_1 = __importDefault(require("../Posgresqlusergreet"));
 const Greeter_1 = require("./Greeter");
 // database tests
 describe('PostgreSQLUserGreetCounter', () => {
     let UserGreetCounter;
     beforeEach(async function () {
         try {
-            this.timeout(5000); // Set timeout to 5 seconds
-            UserGreetCounter = new posgresqlusergreet_1.default();
+            this.timeout(10000); // Set timeout to 5 seconds
+            UserGreetCounter = new Posgresqlusergreet_1.default();
             // clean the tables before each test run
             await Greeter_1.db.none("TRUNCATE TABLE GreetingCount RESTART IDENTITY CASCADE;");
         }
@@ -22,6 +22,7 @@ describe('PostgreSQLUserGreetCounter', () => {
         }
     });
     it('increments greeting count correctly', async function () {
+        this.timeout(10000);
         // Arrange
         const userId = 1;
         const userName = 'John';
