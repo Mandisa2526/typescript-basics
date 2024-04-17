@@ -1,6 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class MapUserGreetCounter {
+    userGreetCounter(arg0, userGreetCounter) {
+        throw new Error('Method not implemented.');
+    }
     constructor() {
         this.greetedUsers = new Map();
     }

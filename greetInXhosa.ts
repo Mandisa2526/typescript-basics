@@ -1,4 +1,4 @@
-import { GreetIn } from "./person";
+import { GreetIn } from "./GreetIn";
 
 // Implementing the GreetIn interface
 export default class GreetInXhosa implements GreetIn {

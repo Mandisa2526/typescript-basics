@@ -1,4 +1,4 @@
-import { GreetIn } from "./person";
+import { GreetIn } from "./GreetIn";
 
 export default class GreetInEnglish implements GreetIn {
     greet(name: string) {

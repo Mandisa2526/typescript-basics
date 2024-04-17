@@ -1,18 +1,11 @@
 //import Person from './person';
-import { language } from './language';
+import { language } from './Language';
 import GreetInEnglish from './greetInEnglish';
 import GreetInXhosa from './greetInXhosa';
 import GreetInZulu from './greetInZulu';
-import { UserGreetCounter } from './person';
-import MapUserGreetCounter from './userCounter';
-import { Pool } from 'pg';
-import {Greetable} from './person'
-
-
-
-export interface GreetIn {
-  greet(name: string): string;
-}
+import { UserGreetCounter } from "./UserGreetCounter";
+import { Greetable } from "./Greetable";
+import { GreetIn } from './GreetIn';
 
 export function greet(name: string, chosenLanguage: language) {
   let greetIn: GreetIn = new GreetInEnglish();
@@ -41,38 +34,6 @@ greetLanguages.set(language.xhosa, xhosaGreet);
 greetLanguages.set(language.zulu, zuluGreet);
 
 //// Instantiate MapUserGreetCounter
-const userGreetCounter = new MapUserGreetCounter();
-
-// export class Greetable {
-//   // create a Map that has a languages enum as a key and a GreetIn interface instance as a value
-
-//   private greetLanguages: Map<language, GreetIn>//This map is intended to store mappings between languages (keys) and instances of objects implementing the GreetIn interface (values).
-//   private userGreetCounter: UserGreetCounter;//ntended to keep track of the count of greetings and users' greet counts.
-
-
-//   constructor(greetLanguages: Map<language, GreetIn>) {
-//     this.greetLanguages = greetLanguages;
-//     this.userGreetCounter = userGreetCounter;
-//   }
-
-//   greet(name: string, chosenLanguage: language): string {
-//     let greetIn = this.greetLanguages.get(chosenLanguage);
-//     this.userGreetCounter.countGreet(name);
-//     if (greetIn) {
-//       return greetIn.greet(name);
-//     }
-//     return "";
-//   }
-//   // call the greetCounter on the userGreetCounter
-//   //a getter method for retrieving the greet counter from the userGreetCounter property.
-//   public get greetCounter(): number {
-//     return this.userGreetCounter.greetCounter;
-//   }
-//   // call the userGreetCount on the userGreetCounter
-//   userGreetCount(firstName: string): number {
-//     return this.userGreetCounter.userGreetCount(firstName);
-//   }
-//}
 
 export class Greeter implements Greetable {
   private greetable: Greetable
@@ -99,6 +60,7 @@ export class Greeter implements Greetable {
       return this.userGreetCounter.userGreetCount(firstName);
   }
 }
+//responsible for managing different greetings for various languages. 
 export class GreetInManager implements Greetable {
     
   constructor(private greetLanguages: Map<language, GreetIn>) {
