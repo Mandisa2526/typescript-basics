@@ -9,6 +9,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/dotenv": "^8.2.0",
     "@types/jest": "^29.5.12",
     "@types/mocha": "^10.0.6",
     "@types/node": "^20.11.27",
@@ -23,7 +24,6 @@
     "test": "test"
   },
   "dependencies": {
-    "@types/dotenv": "^8.2.0",
     "@types/pg": "^8.11.4",
     "acorn": "^8.11.3",
     "acorn-walk": "^8.3.2",
