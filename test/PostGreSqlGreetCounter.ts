@@ -46,7 +46,7 @@ describe('PostgreSQLUserGreetCounter', () => {
     const count = await UserGreetCounter.getGreetingCount(2, 'Alice');
 
     assert.equal(2, count);
-  
+
   });
 
 });

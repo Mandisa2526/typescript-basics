@@ -7,14 +7,14 @@ import pool from '../model/database';
 
 
 describe('PostgreSQLGreetable', () => {
-  
+
 
   //let greetable: PostgreSQLGreetable;
   const greetable = new PostgreSQLGreetable(pool);
-  
+
   // Initialize the greetable instance
   beforeEach(async function (this: Context) {
-  
+
     try {
       this.timeout(10000);
       // clean the tables before each test run
@@ -30,15 +30,15 @@ describe('PostgreSQLGreetable', () => {
     }
   });
 
-  it('should add language greeting', async function(this: Context){
+  it('should add language greeting', async function (this: Context) {
     this.timeout(10000);
     // Act
-     await greetable.addLanguageGreeting('en', 'Hello');
+    await greetable.addLanguageGreeting('en', 'Hello');
 
 
 
   });
-  it('should get greeting for language', async function(this: Context){
+  it('should get greeting for language', async function (this: Context) {
     this.timeout(10000);
     // Act
     const greeting = await greetable.getGreeting('en');
@@ -47,5 +47,5 @@ describe('PostgreSQLGreetable', () => {
     assert.equal('Hello', greeting)
 
   });
-  
+
 });  

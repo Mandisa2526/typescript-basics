@@ -22,7 +22,7 @@ export default class PostgreSQLUserGreetCounter implements GreetingCount {
                 DO UPDATE 
                 SET user_count = GreetingCount.user_count + 1
             `, [userId, user_name]);
-        }catch (error:any) {
+        } catch (error: any) {
             throw new Error('Error incrementing greeting count: ' + error.message);
         }
     }
@@ -35,9 +35,9 @@ export default class PostgreSQLUserGreetCounter implements GreetingCount {
                 WHERE id = $1 AND user_name = $2`, [userId, user_name]
             );
             return result ? result.user_count : 0;
-        } catch (error:any) {
+        } catch (error: any) {
             throw new Error('Error retrieving greeting count: ' + error.message);
         }
     }
-    
+
 }

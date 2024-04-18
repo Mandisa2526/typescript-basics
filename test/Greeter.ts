@@ -92,58 +92,58 @@ describe('Greeter', () => {
 
     const greeting = greeter.greet(name, chosenLanguage);
 
-    assert.equal(expectedGreeting,greeting)
-});
+    assert.equal(expectedGreeting, greeting)
+  });
 
-it('should greet the user correctly in Xhosa', () => {
-  const name = 'Ayanda';
-  const chosenLanguage = language.xhosa;
-  const expectedGreeting = `Molo, Ayanda`;
+  it('should greet the user correctly in Xhosa', () => {
+    const name = 'Ayanda';
+    const chosenLanguage = language.xhosa;
+    const expectedGreeting = `Molo, Ayanda`;
 
-  const greeting = greeter.greet(name, chosenLanguage);
+    const greeting = greeter.greet(name, chosenLanguage);
 
-  assert.equal(expectedGreeting,greeting)
-});
+    assert.equal(expectedGreeting, greeting)
+  });
 
-it('should greet the user correctly in Zulu', () => {
-  const name = 'John';
-  const chosenLanguage = language.zulu;
-  const expectedGreeting = `Sawubona, John`;
+  it('should greet the user correctly in Zulu', () => {
+    const name = 'John';
+    const chosenLanguage = language.zulu;
+    const expectedGreeting = `Sawubona, John`;
 
-  const greeting = greeter.greet(name, chosenLanguage);
+    const greeting = greeter.greet(name, chosenLanguage);
 
-  assert.equal(expectedGreeting,greeting)
-});
-it('should return a blank greeting if language is not available', () => {
-  const name = 'John';
-  const chosenLanguage = language.frnc; // Assuming French is not available
-  const expectedGreeting = '';
+    assert.equal(expectedGreeting, greeting)
+  });
+  it('should return a blank greeting if language is not available', () => {
+    const name = 'John';
+    const chosenLanguage = language.frnc; // Assuming French is not available
+    const expectedGreeting = '';
 
-  const greeting = greeter.greet(name, chosenLanguage);
-  assert.equal(expectedGreeting,greeting)
-  
-});
-it('should increment greet counter when greeting a user', () => {
-  const name = 'John';
-  const chosenLanguage = language.eng;
+    const greeting = greeter.greet(name, chosenLanguage);
+    assert.equal(expectedGreeting, greeting)
 
-   greeter.greet(name, chosenLanguage);
- 
-  // Check if the greet counter has been incremented
- assert.equal(5,greeter.greetCounter)
- 
-});
+  });
+  it('should increment greet counter when greeting a user', () => {
+    const name = 'John';
+    const chosenLanguage = language.eng;
 
-it('should increment greet counter for each user', () => {
-  const names = ['Alice', 'Bob', 'Charlie'];
-  const chosenLanguage = language.eng;
+    greeter.greet(name, chosenLanguage);
 
-  // Greet multiple users
-  names.forEach((name) => greeter.greet(name, chosenLanguage));
-  // Check if the greet counter has been incremented for each user
-  
-  assert.equal(8,greeter.greetCounter)
-});
+    // Check if the greet counter has been incremented
+    assert.equal(5, greeter.greetCounter)
+
+  });
+
+  it('should increment greet counter for each user', () => {
+    const names = ['Alice', 'Bob', 'Charlie'];
+    const chosenLanguage = language.eng;
+
+    // Greet multiple users
+    names.forEach((name) => greeter.greet(name, chosenLanguage));
+    // Check if the greet counter has been incremented for each user
+
+    assert.equal(8, greeter.greetCounter)
+  });
 
 });
 

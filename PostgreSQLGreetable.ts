@@ -11,7 +11,7 @@ export class PostgreSQLGreetable implements Greetable {
             const query = 'INSERT INTO language_greetings (language, greeting) VALUES ($1, $2)';
             await this.pool.query(query, [language, greeting]);
         } catch (error: any) {
-            throw new Error('Failed to add language greeting:'  + error.message);
+            throw new Error('Failed to add language greeting:' + error.message);
         }
     }
 

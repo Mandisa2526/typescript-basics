@@ -40,38 +40,38 @@ export class Greeter implements Greetable {
   private userGreetCounter: UserGreetCounter;
 
   constructor(greetable: Greetable, userGreetCounter: UserGreetCounter) {
-      this.greetable = greetable;
-      this.userGreetCounter = userGreetCounter;
+    this.greetable = greetable;
+    this.userGreetCounter = userGreetCounter;
   }
 
   greet(name: string, chosenLanguage: language) {
-      // get the greeting message
-      let message = this.greetable.greet(name, chosenLanguage);
-      // mange the user count
-      this.userGreetCounter.countGreet(name);
-      return message;
+    // get the greeting message
+    let message = this.greetable.greet(name, chosenLanguage);
+    // mange the user count
+    this.userGreetCounter.countGreet(name);
+    return message;
   }
 
   public get greetCounter(): number {
-      return this.userGreetCounter.greetCounter;
+    return this.userGreetCounter.greetCounter;
   }
 
   userGreetCount(firstName: string): number {
-      return this.userGreetCounter.userGreetCount(firstName);
+    return this.userGreetCounter.userGreetCount(firstName);
   }
 }
 //responsible for managing different greetings for various languages. 
 export class GreetInManager implements Greetable {
-    
+
   constructor(private greetLanguages: Map<language, GreetIn>) {
-      this.greetLanguages = greetLanguages;
+    this.greetLanguages = greetLanguages;
   }
 
   greet(firstName: string, language: language): string {
-      let greetIn = this.greetLanguages.get(language);
-      if (greetIn) {
-          return greetIn.greet(firstName);
-      }
-      return "";
+    let greetIn = this.greetLanguages.get(language);
+    if (greetIn) {
+      return greetIn.greet(firstName);
+    }
+    return "";
   }
 }
